@@ -39,6 +39,69 @@ $ $params = @("test", "--target", ":51250", "--collector", ":51251", "--port", "
 $ .\hrtester  @params &
 ```
 
+Starting services:
+
+```pwsh
+$ # Check the status of the mock service
+$ Invoke-RestMethod -Uri "http://localhost:51250/__service" -Method Get
+
+status
+------
+ready
+
+$ # Configure the mock service with response delays
+$ $data = @{
+    duration = "5m"
+    response = @{
+        headerLatency = @{
+            min = "10ms"
+            max = "50ms"
+        }
+        duration      = @{
+            min = "30ms"
+            max = "100ms"
+        }
+    }
+} | ConvertTo-Json
+$ Invoke-RestMethod -Uri "http://localhost:51250/__mock" -Method Post  -ContentType "application/json" -Body $data
+
+$ # Verify the mock service is running
+$ Invoke-RestMethod -Uri "http://localhost:51250/__service" -Method Get
+
+status  duration
+------  --------
+running 292363ms
+
+$ # Configure and start a test run
+$ $data = @{
+>>     name            = "10s-20rps-2t"
+>>     duration        = "10s"
+>>     pace            = "20rps"
+>>     parallelTesters = 2
+>>     timeout         = "200ms"
+>>     choice          = "roundrobin"
+>>     reqSchema       = "http"
+>>     reqIDHeader     = "X-Request-ID"
+>>     requests        = @(
+>>         @{
+>>             method = "GET"
+>>             path   = "/1"
+>>             header = @{
+>>                 Connection = "keep-alive"
+>>             }
+>>         }
+>>     )
+>> } | ConvertTo-Json -Depth 3
+$ Invoke-RestMethod -Uri "http://localhost:10090/test" -Method Post -ContentType "application/json" -Body $data
+
+$ # Check test service status
+$ Invoke-RestMethod -Uri "http://localhost:10090/__service" -Method Get
+
+status  duration
+------  --------
+testing 1262ms
+```
+
 ### HTTPS (TLS-Enabled)
 
 Starting servers:
