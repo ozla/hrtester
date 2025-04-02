@@ -173,30 +173,27 @@ func (s *service) processResults(ctx context.Context) {
 	defer close(s.terminated)
 
 	w := csv.NewWriter(s.csv)
+	ticker := time.NewTicker(FlushInterval * time.Millisecond)
+	defer ticker.Stop()
 
-	go func() {
-		<-ctx.Done()
-		close(s.results)
-	}()
-
-	go func() {
-		for range time.Tick(FlushInterval * time.Millisecond) {
-			select {
-			case <-ctx.Done():
+	for {
+		select {
+		case r, ok := <-s.results:
+			if !ok {
 				w.Flush()
+				if err := s.csv.Close(); err != nil {
+					log.Error("failed to close CSV file", err)
+				}
 				return
-			default:
-				w.Flush()
 			}
+			if err := w.Write(r.Slice()); err != nil {
+				log.Error("failed to write result", err)
+			}
+		case <-ticker.C:
+			w.Flush()
+		case <-ctx.Done():
+			close(s.results)
 		}
-	}()
-
-	for r := range s.results {
-		w.Write(r.Slice())
-	}
-
-	if err := s.csv.Close(); err != nil {
-		log.Error("failed to close CSV file", err)
 	}
 }
 
