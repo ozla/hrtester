@@ -35,6 +35,9 @@ const (
 
 	idsBufferSize     = 100
 	resultsBufferSize = 20
+
+	spinupFactor      = 4
+	spinupMaxDuration = int64(10 * time.Second)
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,9 +374,16 @@ func runTesters(s *service) {
 		slog.String("targetDuration", targetDuration.Truncate(time.Millisecond).String()),
 	)
 
+	// Stagger tester startup across min(spinupMaxDuration, 1/spinupFactor of total test duration)
+	spinup := time.Duration(s.params.Duration).Nanoseconds() / int64(spinupFactor)
+	if spinup > spinupMaxDuration {
+		spinup = spinupMaxDuration
+	}
+	spinup = spinup / int64(s.params.ParallelTesters)
+
 	wg := sync.WaitGroup{}
-	for i := 0; i < int(s.params.ParallelTesters); i++ {
-		time.Sleep(time.Duration(rand.Int64N(int64(targetDuration))))
+	for i := range int(s.params.ParallelTesters) {
+		time.Sleep(time.Duration(rand.Int64N(spinup)))
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
