@@ -53,7 +53,11 @@ func (s *service) Start() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	s.cancelWrite = cancel
-	go s.processResults(ctx)
+	go func() {
+		<-ctx.Done()
+		close(s.results)
+	}()
+	go s.processResults()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc(
@@ -169,7 +173,7 @@ func (s *service) handleService(w http.ResponseWriter, r *http.Request) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-func (s *service) processResults(ctx context.Context) {
+func (s *service) processResults() {
 	defer close(s.terminated)
 
 	w := csv.NewWriter(s.csv)
@@ -191,8 +195,6 @@ func (s *service) processResults(ctx context.Context) {
 			}
 		case <-ticker.C:
 			w.Flush()
-		case <-ctx.Done():
-			close(s.results)
 		}
 	}
 }
