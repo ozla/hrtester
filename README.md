@@ -43,7 +43,7 @@ Starting services:
 
 ```pwsh
 $ # Check the status of the mock service
-$ Invoke-RestMethod -Uri "http://localhost:51250/__service" -Method Get
+$ Invoke-RestMethod -Uri "http://localhost:51250/__service/" -Method Get
 
 status
 ------
@@ -63,10 +63,10 @@ $ $data = @{
         }
     }
 } | ConvertTo-Json
-$ Invoke-RestMethod -Uri "http://localhost:51250/__mock" -Method Post  -ContentType "application/json" -Body $data
+$ Invoke-RestMethod -Uri "http://localhost:51250/__mock/" -Method Post  -ContentType "application/json" -Body $data
 
 $ # Verify the mock service is running
-$ Invoke-RestMethod -Uri "http://localhost:51250/__service" -Method Get
+$ Invoke-RestMethod -Uri "http://localhost:51250/__service/" -Method Get
 
 status  duration
 ------  --------
@@ -95,7 +95,7 @@ $ $data = @{
 $ Invoke-RestMethod -Uri "http://localhost:10090/test" -Method Post -ContentType "application/json" -Body $data
 
 $ # Check test service status
-$ Invoke-RestMethod -Uri "http://localhost:10090/__service" -Method Get
+$ Invoke-RestMethod -Uri "http://localhost:10090/__service/" -Method Get
 
 status  duration
 ------  --------
@@ -164,10 +164,10 @@ $ $data = @{
         }
     }
 } | ConvertTo-Json
-$ Invoke-RestMethod -Uri "https://localhost:51250/__mock" -Method Post  -ContentType "application/json" -Body $data -SkipCertificateCheck -Certificate $cert
+$ Invoke-RestMethod -Uri "https://localhost:51250/__mock/" -Method Post  -ContentType "application/json" -Body $data -SkipCertificateCheck -Certificate $cert
 
 $ # Verify the mock service is running
-$ Invoke-RestMethod -Uri "https://localhost:51250/__service" -Method Get -SkipCertificateCheck -Certificate $cert
+$ Invoke-RestMethod -Uri "https://localhost:51250/__service/" -Method Get -SkipCertificateCheck -Certificate $cert
 
 status  duration
 ------  --------
@@ -193,10 +193,10 @@ $ $data = @{
 >>         }
 >>     )
 >> } | ConvertTo-Json -Depth 3
-$ Invoke-RestMethod -Uri "https://localhost:10090/test" -Method Post -ContentType "application/json" -Body $data
+$ Invoke-RestMethod -Uri "http://localhost:10090/test" -Method Post -ContentType "application/json" -Body $data
 
 $ # Check test service status
-$ Invoke-RestMethod -Uri "https://localhost:10090/__service" -Method Get
+$ Invoke-RestMethod -Uri "http://localhost:10090/__service/" -Method Get
 
 status  duration
 ------  --------

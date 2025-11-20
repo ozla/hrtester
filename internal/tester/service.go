@@ -133,7 +133,7 @@ func (s *service) Start() {
 func (s *service) shutdown() {
 	s.shutdownOnce.Do(
 		func() {
-			log.Info("shutting down teseter server, hrtester test process will terminate")
+			log.Info("shutting down tester server; hrtester process will terminate")
 			go func() {
 				defer close(s.terminated)
 				if s.testCancel != nil {

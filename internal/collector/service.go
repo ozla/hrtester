@@ -103,7 +103,7 @@ func (s *service) Start() {
 func (s *service) shutdown() {
 	s.shutdownOnce.Do(
 		func() {
-			log.Info("shutting down collector server, hrtester collect process will terminate")
+			log.Info("shutting down collector server; hrtester process will terminate")
 
 			go func() {
 				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
