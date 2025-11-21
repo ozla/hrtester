@@ -180,7 +180,6 @@ func (s *service) handleDefault(w http.ResponseWriter, r *http.Request) {
 		headDelay += time.Duration(rand.Int64N(d))
 	}
 
-	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 	if headDelay > 0 {

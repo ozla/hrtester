@@ -91,7 +91,7 @@ func NewTestResult(vs url.Values) TestResult {
 }
 
 func (r *TestResult) SetRequestTime(t time.Time) {
-	r[trRequestTime] = t.Format(time.DateTime)
+	r[trRequestTime] = t.Format("2006-01-02T15:04:05.999")
 }
 
 func (r *TestResult) SetTestName(name string) {

@@ -411,10 +411,10 @@ func runTesters(s *service) {
 							cert *x509.Certificate
 							err  error
 						)
-						switch n := len(rawCerts); {
-						case n == 0:
+						switch n := len(rawCerts); n {
+						case 0:
 							return fmt.Errorf("no server certificate received")
-						case n == 1:
+						case 1:
 							if cert, err = x509.ParseCertificate(rawCerts[0]); err != nil {
 								return fmt.Errorf("failed to parse certificate: %w", err)
 							}
